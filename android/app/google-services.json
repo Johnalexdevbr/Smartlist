@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "219495156557",
+    "project_id": "smartlist-a6a8a",
+    "storage_bucket": "smartlist-a6a8a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:219495156557:android:fcb45bc76f3cf291108504",
+        "android_client_info": {
+          "package_name": "com.example.feiranexus"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAt8hJg2izKxun3TtU15m8E7cuoQaXRir8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
