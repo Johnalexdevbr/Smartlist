@@ -195,11 +195,13 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  // --- FUNÇÃO AJUSTADA AQUI ---
   void _finalizarCompra() {
     if (_itens.isEmpty) return;
 
     showDialog(
       context: context,
+      barrierDismissible: false, // Evita fechar clicando fora durante o salvamento
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: const Row(
@@ -216,23 +218,47 @@ class _HomePageState extends State<HomePage> {
           TextButton(onPressed: () => Navigator.pop(ctx), child: const Text("Revisar")),
           ElevatedButton(
             onPressed: () async {
-              // SALVANDO NO FIREBASE
-              await FirebaseFirestore.instance.collection('historico').add({
-                'data': DateTime.now(),
-                'total': _totalGeral,
-                'itens': _itens.map((i) => {'nome': i.nome, 'preco': i.preco, 'qtd': i.quantidade}).toList(),
-              });
+              try {
+                // 1. Criamos a lista de mapas ANTES de limpar o estado
+                final dadosItens = _itens.map((i) => {
+                  'nome': i.nome.isEmpty ? "Sem nome" : i.nome,
+                  'preco': i.preco,
+                  'qtd': i.quantidade,
+                  'subtotal': i.subtotal
+                }).toList();
 
-              setState(() => _itens.clear());
-              if (mounted) {
-                Navigator.pop(ctx);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text("Compra arquivada com sucesso! ✅"),
-                    backgroundColor: Color(0xFF6c5ce7),
-                    behavior: SnackBarBehavior.floating,
-                  ),
-                );
+                final totalFinal = _totalGeral;
+
+                // 2. Enviamos para o Firebase
+                await FirebaseFirestore.instance.collection('historico').add({
+                  'data': FieldValue.serverTimestamp(), // Usa a hora do servidor para precisão
+                  'total': totalFinal,
+                  'itens': dadosItens,
+                });
+
+                // 3. Só agora limpamos a tela e fechamos o diálogo
+                if (mounted) {
+                  setState(() => _itens.clear());
+                  Navigator.pop(ctx);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("Compra arquivada com sucesso! ✅"),
+                      backgroundColor: Color(0xFF6c5ce7),
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
+                }
+              } catch (e) {
+                // Se der erro (ex: falta de internet ou permissão), avisamos o usuário
+                if (mounted) {
+                  Navigator.pop(ctx);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text("Erro ao salvar: $e"),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
               }
             },
             child: const Text("Confirmar"),
@@ -547,9 +573,14 @@ class HistoryPage extends StatelessWidget {
             itemCount: docs.length,
             padding: const EdgeInsets.all(16),
             itemBuilder: (context, index) {
-              final data = docs[index].data() as Map<String, dynamic>;
-              final DateTime date = (data['data'] as Timestamp).toDate();
-              final double total = data['total'] ?? 0.0;
+              final doc = docs[index];
+              final data = doc.data() as Map<String, dynamic>;
+
+              // Tratamento seguro para data nula enquanto o servidor processa o timestamp
+              final dynamic timestamp = data['data'];
+              final DateTime date = timestamp != null ? (timestamp as Timestamp).toDate() : DateTime.now();
+
+              final double total = (data['total'] ?? 0.0).toDouble();
               final List itens = data['itens'] ?? [];
 
               return Card(
