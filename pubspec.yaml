@@ -1,38 +1,30 @@
-name: feiranexus
-description: "A new Flutter project."
-publish_to: 'none'
+name: Deploy to Firebase Hosting on merge
+on:
+  push:
+    branches:
+      - main
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
-version: 1.0.0+1
+      - name: Install Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          flutter-version: '3.6.1'
 
-environment:
-  sdk: ^3.6.1
+      - name: Install Dependencies
+        run: flutter pub get
 
-dependencies:
-  flutter:
-    sdk: flutter
+      - name: Build Web
+        run: flutter build web --release
 
-  cupertino_icons: ^1.0.8
-  shared_preferences: ^2.3.5
-  intl: ^0.20.2
-
-  firebase_core: ^3.10.1
-  cloud_firestore: ^5.6.2
-
-dev_dependencies:
-  flutter_test:
-    sdk: flutter
-  flutter_lints: ^5.0.0
-  flutter_launcher_icons: ^0.13.1
-
-flutter_launcher_icons:
-  android: "launcher_icon"
-  ios: true
-  image_path: "assets/icon.png"
-  adaptive_icon_background: "#6c5ce7"
-  adaptive_icon_foreground: "assets/icon.png"
-
-flutter:
-  uses-material-design: true
-
-  assets:
-    - assets/
+      - name: Deploy to Firebase Hosting
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: '${{ secrets.GITHUB_TOKEN }}'
+          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_SMARTLIST_A6A8A }}'
+          projectId: smartlist-a6a8a
+          channelId: live
