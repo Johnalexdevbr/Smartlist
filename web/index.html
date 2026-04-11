@@ -1,122 +1,150 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <base href="$FLUTTER_BASE_HREF">
-  <meta charset="UTF-8">
-  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="SmartList - Sua lista de feira inteligente.">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="SmartList">
-  <link rel="apple-touch-icon" href="icons/Icon-192.png">
-  <link rel="icon" type="image/png" href="favicon.png"/>
-  <title>SmartList</title>
-  <link rel="manifest" href="manifest.json">
-  <style>
-    body {
-      background-color: #6c5ce7;
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-      width: 100vw;
-      height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    }
-    #loading-screen {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      transition: opacity 0.4s ease-out;
-    }
-    .logo-container {
-      width: 100px;
-      height: 100px;
-      background: rgba(255, 255, 255, 0.15);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border-radius: 24px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 24px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      animation: pulse 2s infinite ease-in-out;
-    }
-    .logo-icon {
-      font-size: 50px;
-      color: white;
-    }
-    .progress-bar-container {
-      width: 180px;
-      height: 4px;
-      background: rgba(255, 255, 255, 0.2);
-      border-radius: 10px;
-      overflow: hidden;
-    }
-    .progress-fill {
-      width: 30%;
-      height: 100%;
-      background: white;
-      border-radius: 10px;
-      animation: loading-bar 2s infinite ease-in-out;
-    }
-    .loading-text {
-      color: rgba(255, 255, 255, 0.9);
-      font-size: 14px;
-      font-weight: 500;
-      margin-top: 16px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-    }
-    @keyframes pulse {
-      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.3); }
-      70% { transform: scale(1); box-shadow: 0 0 0 20px rgba(255, 255, 255, 0); }
-      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
-    }
-    @keyframes loading-bar {
-      0% { transform: translateX(-100%); }
-      50% { transform: translateX(0%); }
-      100% { transform: translateX(100%); }
-    }
-    .fade-out {
-      opacity: 0;
-      pointer-events: none;
-    }
-  </style>
+    <base href="$FLUTTER_BASE_HREF">
+
+    <meta charset="UTF-8">
+    <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+    <meta name="description" content="SmartList - Sua lista de feira inteligente.">
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="SmartList">
+    <link rel="apple-touch-icon" href="icons/Icon-192.png">
+
+    <link rel="icon" type="image/png" href="favicon.png"/>
+
+    <title>SmartList</title>
+    <link rel="manifest" href="manifest.json">
+
+    <style>
+        body {
+          background-color: #6c5ce7;
+          margin: 0;
+          padding: 0;
+          overflow: hidden;
+          width: 100vw;
+          height: 100vh;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        #loading-screen {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          transition: opacity 0.4s ease-out;
+          z-index: 9999; /* Garantia de ficar no topo */
+        }
+
+        .logo-container {
+          width: 100px;
+          height: 100px;
+          background: rgba(255, 255, 255, 0.15);
+          backdrop-filter: blur(10px);
+          -webkit-backdrop-filter: blur(10px);
+          border-radius: 24px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-bottom: 24px;
+          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          animation: pulse 2s infinite ease-in-out;
+        }
+
+        .logo-icon {
+          font-size: 50px;
+          user-select: none;
+        }
+
+        .progress-bar-container {
+          width: 180px;
+          height: 4px;
+          background: rgba(255, 255, 255, 0.2);
+          border-radius: 10px;
+          overflow: hidden;
+          position: relative;
+          transform: translateZ(0); /* Melhora performance no mobile */
+        }
+
+        .progress-fill {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          background: white;
+          border-radius: 10px;
+          animation: loading-bar 1.8s infinite cubic-bezier(0.65, 0, 0.35, 1);
+          transform-origin: left;
+        }
+
+        .loading-text {
+          color: rgba(255, 255, 255, 0.9);
+          font-size: 14px;
+          font-weight: 500;
+          margin-top: 16px;
+          letter-spacing: 2px;
+          text-transform: uppercase;
+          user-select: none;
+        }
+
+        @keyframes pulse {
+          0% { transform: scale(0.98); opacity: 0.8; }
+          50% { transform: scale(1.05); opacity: 1; }
+          100% { transform: scale(0.98); opacity: 0.8; }
+        }
+
+        @keyframes loading-bar {
+          0% { transform: translateX(-100%) scaleX(0.2); }
+          50% { transform: translateX(0%) scaleX(0.5); }
+          100% { transform: translateX(100%) scaleX(0.2); }
+        }
+
+        .fade-out {
+          opacity: 0 !important;
+          pointer-events: none;
+        }
+    </style>
 </head>
 <body>
 <div id="loading-screen">
-  <div class="logo-container">
-    <span class="logo-icon">🛒</span>
-  </div>
-  <div class="progress-bar-container">
-    <div class="progress-fill"></div>
-  </div>
-  <div class="loading-text">SmartList</div>
+    <div class="logo-container">
+        <span class="logo-icon">🛒</span>
+    </div>
+    <div class="progress-bar-container">
+        <div class="progress-fill"></div>
+    </div>
+    <div class="loading-text">SmartList</div>
 </div>
+
 <script src="flutter_bootstrap.js" async></script>
+
 <script>
-  (function() {
-    var loadingScreen = document.getElementById('loading-screen');
-    window.addEventListener('flutter-first-frame', function() {
-      loadingScreen.classList.add('fade-out');
-      setTimeout(function() {
-        loadingScreen.remove();
-      }, 400);
-    });
-    window.addEventListener('load', function() {
-      setTimeout(function() {
-        if (document.body.contains(loadingScreen)) {
-          loadingScreen.classList.add('fade-out');
-          setTimeout(() => loadingScreen.remove(), 400);
-        }
-      }, 5000);
-    });
-  })();
+    (function() {
+      var loadingScreen = document.getElementById('loading-screen');
+
+      // Detecta quando o Flutter está pronto
+      window.addEventListener('flutter-first-frame', function() {
+        loadingScreen.classList.add('fade-out');
+        setTimeout(function() {
+          if (loadingScreen && loadingScreen.parentNode) {
+            loadingScreen.remove();
+          }
+        }, 500);
+      });
+
+      // Fail-safe para garantir que a tela suma mesmo se o script falhar
+      window.addEventListener('load', function() {
+        setTimeout(function() {
+          if (document.body.contains(loadingScreen)) {
+            loadingScreen.classList.add('fade-out');
+            setTimeout(() => loadingScreen.remove(), 500);
+          }
+        }, 10000); // 10 segundos de limite máximo
+      });
+    })();
 </script>
 </body>
 </html>
